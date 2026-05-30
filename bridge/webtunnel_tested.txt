@@ -57,7 +57,6 @@ webtunnel [2001:db8:8a96:b122:e199:d511:c55e:6bcb]:443 F5038BA595B75BD87A295CA60
 webtunnel [2001:db8:8a96:b122:e199:d511:c55e:6bcb]:443 F5038BA595B75BD87A295CA6060214CCD4280F2F url=https://bridges.lovethosetrains.com/iwCXEhbdY7ErwP8J4MRavyAj ver=0.0.4
 webtunnel [2001:db8:8d16:cb5b:d7f5:504b:8768:bdd3]:443 570FEB15763CC623146E8433ACA751948A6756D4 url=https://pl.808.re/SDglNGoixITem7ZHxQKXSscK ver=0.0.2
 webtunnel [2001:db8:8e11:37cf:5167:5fce:4650:c2f8]:443 5AE50E81167318FE0A152D4F050C839DB42AB9B8 url=https://signaling.privacy-vbox.de/s6CjTuyWZOWe9Fbhl7ThQ5Lb ver=0.0.2
-webtunnel [2001:db8:90af:6d79:cafb:22d:9fc:8ba5]:443 E88DDF7ECA143274DDDC87D552C70110B8702367 url=https://topwager.bet/0a710ccee8e0ab2e2c6841833cb6a63a ver=0.0.4
 webtunnel [2001:db8:92ce:dea9:9efb:61f8:b7e2:4971]:443 291666C8F9E8736771E046DAC04FA4DA35F89467 url=https://deimos.fedfe1.xyz/13m07GMVvrE78vs1VZXl ver=0.0.3
 webtunnel [2001:db8:a273:b501:5987:3660:5d1b:1603]:443 082B13E0A1E5D8D2585B6C84914B1810B7E884EC url=https://s3.vlue.dev/s33gf0iiidqo9lacdqzbjgy6 ver=0.0.3
 webtunnel [2001:db8:a379:1522:ea89:9c9d:59c8:1d5a]:443 B55A418B4F30181ED304EB2698EE58D283BEE5BF url=https://mirror.sanin.dev/f6VK8vgUKiq3HX6FHdbQpUaa ver=0.0.3
