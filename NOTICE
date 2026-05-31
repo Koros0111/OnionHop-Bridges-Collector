@@ -1,0 +1,33 @@
+OnionHop Bridges Collector
+Copyright (C) 2026 center2055
+
+This program is free software, licensed under the GNU Affero General Public
+License, version 3 (AGPL-3.0). See the LICENSE file for the full terms.
+
+-------------------------------------------------------------------------------
+Attribution / derivation
+-------------------------------------------------------------------------------
+
+This project is a derivative work. It was adapted from:
+
+    Tor-Bridges-Collector
+    by Delta-Kronecker
+    https://github.com/Delta-Kronecker/Tor-Bridges-Collector
+    Licensed under AGPL-3.0.
+
+Per the AGPL, this derivative is released under the same license, with the
+original author's copyright and license preserved.
+
+-------------------------------------------------------------------------------
+Data sources
+-------------------------------------------------------------------------------
+
+The Tor bridge lines collected and published by this tool are public
+circumvention data obtained from:
+
+  * The Tor Project BridgeDB        - https://bridges.torproject.org
+  * The upstream community collector (Delta-Kronecker/Tor-Bridges-Collector)
+  * The default snowflake / meek / conjure bridge lines shipped with Tor Browser
+
+Tor bridge lines (addresses, fingerprints, transport parameters) are public
+facts published by the Tor network and are not claimed as original work here.

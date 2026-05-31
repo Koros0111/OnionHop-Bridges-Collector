@@ -55,8 +55,21 @@ actually work in their region.
 ## Sources
 
 - Official Tor BridgeDB: `https://bridges.torproject.org`
-- Community seed: [Delta-Kronecker/Tor-Bridges-Collector](https://github.com/Delta-Kronecker/Tor-Bridges-Collector)
+- Community seed: [Delta-Kronecker/Tor-Bridges-Collector](https://github.com/Delta-Kronecker/Tor-Bridges-Collector) — this project is **derived from** it (see License)
 - Fronted defaults: the snowflake/meek/conjure bridge lines shipped with Tor Browser
+
+## License
+
+Licensed under the **GNU Affero General Public License v3.0 (AGPL-3.0)** — see
+[`LICENSE`](LICENSE) and [`NOTICE`](NOTICE).
+
+This project is a derivative work, adapted from
+[Delta-Kronecker/Tor-Bridges-Collector](https://github.com/Delta-Kronecker/Tor-Bridges-Collector)
+(also AGPL-3.0); it is released under the same license with the original
+author's copyright preserved.
+
+Tor bridge lines (addresses, fingerprints, transport parameters) are public
+data published by the Tor network, not original work of this project.
 
 ## Disclaimer
 

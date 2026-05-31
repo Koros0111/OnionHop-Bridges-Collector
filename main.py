@@ -1,4 +1,17 @@
 #!/usr/bin/env python3
+#
+# OnionHop Bridges Collector
+# Copyright (C) 2026 center2055
+#
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option) any
+# later version. This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY. See the GNU AGPL v3 (the LICENSE file) for details.
+#
+# This is a derivative work, adapted from Tor-Bridges-Collector by Delta-Kronecker
+# (https://github.com/Delta-Kronecker/Tor-Bridges-Collector), which is also
+# licensed under AGPL-3.0.
 """
 OnionHop Bridges Collector
 ==========================
@@ -499,8 +512,21 @@ actually work in their region.
 ## Sources
 
 - Official Tor BridgeDB: `https://bridges.torproject.org`
-- Community seed: [Delta-Kronecker/Tor-Bridges-Collector](https://github.com/Delta-Kronecker/Tor-Bridges-Collector)
+- Community seed: [Delta-Kronecker/Tor-Bridges-Collector](https://github.com/Delta-Kronecker/Tor-Bridges-Collector) — this project is **derived from** it (see License)
 - Fronted defaults: the snowflake/meek/conjure bridge lines shipped with Tor Browser
+
+## License
+
+Licensed under the **GNU Affero General Public License v3.0 (AGPL-3.0)** — see
+[`LICENSE`](LICENSE) and [`NOTICE`](NOTICE).
+
+This project is a derivative work, adapted from
+[Delta-Kronecker/Tor-Bridges-Collector](https://github.com/Delta-Kronecker/Tor-Bridges-Collector)
+(also AGPL-3.0); it is released under the same license with the original
+author's copyright preserved.
+
+Tor bridge lines (addresses, fingerprints, transport parameters) are public
+data published by the Tor network, not original work of this project.
 
 ## Disclaimer
 
