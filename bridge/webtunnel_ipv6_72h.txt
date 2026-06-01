@@ -1,1 +1,1 @@
-webtunnel [2001:db8:77dc:4180:2d73:7fda:59f4:5284]:443 6F6C8E0069880AC253704507119464CE4BD1BA65 url=https://dev-test.catcat.pictures/Fj7VnJi1mjigUKBb2rJ1TeWJ ver=0.0.4
+webtunnel [2001:db8:3606:d9c5:1fa:bff3:1d62:7465]:443 900844EDD4FCFA9F7CE18C391A777F12FBFE1C1E url=https://wt5.wtqwert.top/asdfasdf1234wt5 ver=0.0.4
