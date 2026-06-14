@@ -1,1 +1,2 @@
 webtunnel [2001:db8:747d:f959:7714:e5ea:b6d8:66e7]:443 CF1827C41B504EB3CCF3D4EDE7D8D88761F2039E url=https://sp-sk.bitcdn.ovh/standbakhdown ver=0.0.4
+webtunnel [2001:db8:8a9d:77ec:3b4d:ad85:24e0:a700]:443 1FC3F8277DC68922B6DFDFEE6943BF3C79188E6A url=https://unknxwn.lol/H9wNSHum9rxiryQNRCCLjGn8 ver=0.0.4
