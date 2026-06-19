@@ -5,7 +5,7 @@ Automatically collects, validates and archives Tor bridges for the
 hourly to fetch fresh bridges from the official Tor Project and community
 sources, then TCP/TLS-tests them.
 
-_Last updated: 2026-06-19 17:26 UTC_
+_Last updated: 2026-06-19 20:01 UTC_
 
 ## Pooled transports
 
@@ -16,7 +16,7 @@ sources distribute, so they are scraped fresh and connectivity-tested each run.
 | :--- | :--- | :--- | :--- | :--- |
 | **obfs4** | [obfs4_tested.txt](https://raw.githubusercontent.com/center2055/OnionHop-Bridges-Collector/main/bridge/obfs4_tested.txt) (253) | [obfs4_72h.txt](https://raw.githubusercontent.com/center2055/OnionHop-Bridges-Collector/main/bridge/obfs4_72h.txt) (5) | [obfs4.txt](https://raw.githubusercontent.com/center2055/OnionHop-Bridges-Collector/main/bridge/obfs4.txt) (522) | [obfs4_ipv6.txt](https://raw.githubusercontent.com/center2055/OnionHop-Bridges-Collector/main/bridge/obfs4_ipv6.txt) (275) |
 | **webtunnel** | [webtunnel_tested.txt](https://raw.githubusercontent.com/center2055/OnionHop-Bridges-Collector/main/bridge/webtunnel_tested.txt) (91) | [webtunnel_72h.txt](https://raw.githubusercontent.com/center2055/OnionHop-Bridges-Collector/main/bridge/webtunnel_72h.txt) (1) | [webtunnel.txt](https://raw.githubusercontent.com/center2055/OnionHop-Bridges-Collector/main/bridge/webtunnel.txt) (180) | [webtunnel_ipv6.txt](https://raw.githubusercontent.com/center2055/OnionHop-Bridges-Collector/main/bridge/webtunnel_ipv6.txt) (180) |
-| **vanilla** | [vanilla_tested.txt](https://raw.githubusercontent.com/center2055/OnionHop-Bridges-Collector/main/bridge/vanilla_tested.txt) (181) | [vanilla_72h.txt](https://raw.githubusercontent.com/center2055/OnionHop-Bridges-Collector/main/bridge/vanilla_72h.txt) (3) | [vanilla.txt](https://raw.githubusercontent.com/center2055/OnionHop-Bridges-Collector/main/bridge/vanilla.txt) (447) | [vanilla_ipv6.txt](https://raw.githubusercontent.com/center2055/OnionHop-Bridges-Collector/main/bridge/vanilla_ipv6.txt) (39) |
+| **vanilla** | [vanilla_tested.txt](https://raw.githubusercontent.com/center2055/OnionHop-Bridges-Collector/main/bridge/vanilla_tested.txt) (183) | [vanilla_72h.txt](https://raw.githubusercontent.com/center2055/OnionHop-Bridges-Collector/main/bridge/vanilla_72h.txt) (3) | [vanilla.txt](https://raw.githubusercontent.com/center2055/OnionHop-Bridges-Collector/main/bridge/vanilla.txt) (447) | [vanilla_ipv6.txt](https://raw.githubusercontent.com/center2055/OnionHop-Bridges-Collector/main/bridge/vanilla_ipv6.txt) (39) |
 
 IPv6 variants exist for every pooled list (e.g. `obfs4_ipv6_tested.txt`,
 `obfs4_ipv6_72h.txt`). Note: IPv6 `*_tested` lists may be empty because CI
