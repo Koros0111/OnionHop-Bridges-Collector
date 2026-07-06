@@ -10,6 +10,8 @@ webtunnel [2001:db8:28ff:ae4f:c:9ef6:1722:ac46]:443 1098B4E153AB1666B4F63F48325A
 webtunnel [2001:db8:28ff:ae4f:c:9ef6:1722:ac46]:443 1098B4E153AB1666B4F63F48325A103FB005940F url=https://pod04.oneclickhost.eu/FeTyRXzPPAzwIjuxzWxwl09N ver=0.0.4
 webtunnel [2001:db8:2ae3:679a:856c:c72a:2746:1a1b]:443 8943BF53C9561C75A7302ED59575EF71E2B26562 url=https://allium.heelsn.eu/X1uzc7J4omPPBbqkJMDgBtXP ver=0.0.3
 webtunnel [2001:db8:2ae3:679a:856c:c72a:2746:1a1b]:443 8943BF53C9561C75A7302ED59575EF71E2B26562 url=https://allium.heelsn.eu/X1uzc7J4omPPBbqkJMDgBtXP ver=0.0.4
+webtunnel [2001:db8:3506:4f42:d18a:e05e:2c90:c172]:443 C1071E13650A41F1B4A1D93C089D4EF685DD1833 url=https://masterkeef.duckdns.org/9VqR6ogd8uMUqncudbuNeHX1 ver=0.0.4
+webtunnel [2001:db8:3506:4f42:d18a:e05e:2c90:c172]:443 C1071E13650A41F1B4A1D93C089D4EF685DD1833 url=https://masterkeef.duckdns.org/9VqR6ogd8uMUqncudbuNeHX1 ver=0.0.5
 webtunnel [2001:db8:35c8:629c:c5f9:9167:6272:2e92]:443 9D542D1BCF5994FF21ED379AA68DD691F305E03C url=https://webtunnel.offblast.org/oaxifL26HqflyooEBmgvNgmt ver=0.0.3
 webtunnel [2001:db8:3606:d9c5:1fa:bff3:1d62:7465]:443 900844EDD4FCFA9F7CE18C391A777F12FBFE1C1E url=https://wt5.wtqwert.top/asdfasdf1234wt5 ver=0.0.4
 webtunnel [2001:db8:3845:2a14:bb9:481c:73c9:d237]:443 337F12771B8FBA072121C0978B8D5722B567609B url=https://www.cafe-kantholz.de/LceovFqcXy92Ji6Gx0rrUmmB ver=0.0.3
@@ -54,6 +56,7 @@ webtunnel [2001:db8:7d9e:1aa:ee0d:4115:ac82:8007]:443 7CC64C882F0098BCE3AC6D1C14
 webtunnel [2001:db8:7ed3:a85b:fd0f:d2a8:ebbe:a588]:443 A82B7060501179D6131AF6BCCD5DF4EA5F0A0D59 url=https://kochenjessler.de/RhV075MQmlMKQXZ8Bei5AOeQ ver=0.0.3
 webtunnel [2001:db8:80f:be74:6afc:2b7b:e1ca:1daf]:443 3FBF86ADCC8D39D30B3BE340FB0D87F64E64E7EE url=https://hongkong.dagestani.eu/thismustallbefakenews ver=0.0.3
 webtunnel [2001:db8:80f:be74:6afc:2b7b:e1ca:1daf]:443 3FBF86ADCC8D39D30B3BE340FB0D87F64E64E7EE url=https://hongkong.dagestani.eu/thismustallbefakenews ver=0.0.4
+webtunnel [2001:db8:8986:42b5:a784:ef30:f5cd:5e26]:443 07C77888D2367C25CA875E2174D9B225140940E9 url=https://nextcloud.privacy-vbox.de/iJmug5bRcsKeVv45h7a0fvkL ver=0.0.3
 webtunnel [2001:db8:8a96:b122:e199:d511:c55e:6bcb]:443 F5038BA595B75BD87A295CA6060214CCD4280F2F url=https://bridges.lovethosetrains.com/iwCXEhbdY7ErwP8J4MRavyAj ver=0.0.3
 webtunnel [2001:db8:8a96:b122:e199:d511:c55e:6bcb]:443 F5038BA595B75BD87A295CA6060214CCD4280F2F url=https://bridges.lovethosetrains.com/iwCXEhbdY7ErwP8J4MRavyAj ver=0.0.4
 webtunnel [2001:db8:8e11:37cf:5167:5fce:4650:c2f8]:443 5AE50E81167318FE0A152D4F050C839DB42AB9B8 url=https://signaling.privacy-vbox.de/s6CjTuyWZOWe9Fbhl7ThQ5Lb ver=0.0.2
