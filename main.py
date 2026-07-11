@@ -26,7 +26,9 @@ It covers two kinds of transports:
 
   - ``<t>.txt`` / ``<t>_ipv6.txt``              - full archive (union over time)
   - ``<t>_72h.txt`` / ``<t>_ipv6_72h.txt``      - bridges first seen in the last 72h
-  - ``<t>_tested.txt`` / ``<t>_ipv6_tested.txt``- bridges that passed a TCP/TLS reachability test
+  - ``<t>_tested.txt`` / ``<t>_ipv6_tested.txt``- bridges that passed a reachability test: a TCP
+    handshake for obfs4/vanilla, and a real WebSocket-Upgrade handshake to the ``url=`` endpoint
+    (must return 101) for webtunnel, so a live CDN front with no bridge behind it is not counted
 
 * **Fronted** (snowflake, meek-azure, conjure) - no rotating pool exists; these reach Tor through a
   broker / domain fronting using a small set of fixed default lines (placeholder IP). We publish
@@ -43,6 +45,7 @@ Standard library + ``requests`` + ``beautifulsoup4`` only. Designed to run hourl
 
 from __future__ import annotations
 
+import base64
 import concurrent.futures
 import ipaddress
 import json
@@ -51,6 +54,7 @@ import re
 import socket
 import ssl
 from datetime import datetime, timedelta, timezone
+from urllib.parse import urlparse
 
 import requests
 from bs4 import BeautifulSoup
@@ -210,6 +214,73 @@ def test_tls(host: str, port: int) -> bool:
         return False
 
 
+def extract_url(line: str) -> str | None:
+    """Return the raw ``url=`` value of a bridge line (webtunnel's real HTTPS endpoint), or None."""
+    match = re.search(r"(?:^|\s)url=(\S+)", line)
+    return match.group(1) if match else None
+
+
+def test_webtunnel(url: str) -> bool:
+    """Real liveness check for a webtunnel bridge.
+
+    A webtunnel bridge is reached by a WebSocket Upgrade over HTTPS to the exact ``url=`` endpoint
+    (front host + secret path). A live bridge answers ``101 Switching Protocols``; a dead bridge - or
+    a bare CDN/front with nothing behind that path - answers 4xx/5xx/timeout (a live bridge often
+    even answers 502 to a *plain* GET, so only the upgrade handshake is a reliable signal). This is
+    far stronger than a TLS handshake to the host, which every CDN passes even with no bridge behind
+    it, and is how stale webtunnel bridges used to survive the "tested" filter.
+    """
+    parsed = urlparse(url)
+    host = parsed.hostname
+    if not host:
+        return False
+    port = parsed.port or 443
+    path = parsed.path or "/"
+    if parsed.query:
+        path += "?" + parsed.query
+
+    try:
+        raw = socket.create_connection((host, port), timeout=CONNECT_TIMEOUT)
+    except OSError:
+        return False
+
+    status = b""
+    try:
+        ctx = ssl.create_default_context()
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+        server_name = None if is_ip_literal(host) else host
+        with ctx.wrap_socket(raw, server_hostname=server_name) as sock:
+            sock.settimeout(CONNECT_TIMEOUT)
+            key = base64.b64encode(os.urandom(16)).decode("ascii")
+            request = (
+                f"GET {path} HTTP/1.1\r\n"
+                f"Host: {host}\r\n"
+                f"User-Agent: {USER_AGENT}\r\n"
+                "Connection: Upgrade\r\n"
+                "Upgrade: websocket\r\n"
+                f"Sec-WebSocket-Key: {key}\r\n"
+                "Sec-WebSocket-Version: 13\r\n"
+                "\r\n"
+            )
+            sock.sendall(request.encode("latin1"))
+            while b"\r\n" not in status and len(status) < 256:
+                chunk = sock.recv(128)
+                if not chunk:
+                    break
+                status += chunk
+    except (OSError, ssl.SSLError, ValueError):
+        return False
+    finally:
+        try:
+            raw.close()
+        except OSError:
+            pass
+
+    first_line = status.split(b"\r\n", 1)[0].decode("latin1", "replace").split()
+    return len(first_line) >= 2 and first_line[1] == "101"
+
+
 def is_reachable(bridge_line: str) -> bool:
     # Fronted transports (snowflake/meek/conjure) carry a placeholder IP and reach Tor via a broker
     # or domain front; probe that front/broker host on 443 (TLS) instead of the dummy endpoint.
@@ -222,14 +293,19 @@ def is_reachable(bridge_line: str) -> bool:
     host, port, transport = extract_endpoint(bridge_line)
     if not host or not port:
         return False
+
+    # webtunnel: probe the actual bridge, not just the CDN front. A WebSocket Upgrade to the exact
+    # url= endpoint must return 101, otherwise the bridge is dead even if its front still serves TLS.
+    if transport == "webtunnel":
+        url = extract_url(bridge_line)
+        return test_webtunnel(url) if url else False
+
     host_to_test = host
     if not is_ip_literal(host):
         try:
             host_to_test = socket.gethostbyname(host)
         except OSError:
             return False
-    if transport == "webtunnel":
-        return test_tls(host_to_test, port)
     return test_tcp(host_to_test, port)
 
 
