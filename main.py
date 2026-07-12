@@ -27,8 +27,9 @@ It covers two kinds of transports:
   - ``<t>.txt`` / ``<t>_ipv6.txt``              - full archive (union over time)
   - ``<t>_72h.txt`` / ``<t>_ipv6_72h.txt``      - bridges first seen in the last 72h
   - ``<t>_tested.txt`` / ``<t>_ipv6_tested.txt``- bridges that passed a reachability test: a TCP
-    handshake for obfs4/vanilla, and a real WebSocket-Upgrade handshake to the ``url=`` endpoint
-    (must return 101) for webtunnel, so a live CDN front with no bridge behind it is not counted
+    handshake for vanilla (and IPv6 obfs4), a real obfs4 handshake via an obfs4 client for IPv4
+    obfs4, and a real WebSocket-Upgrade handshake to the ``url=`` endpoint (must return 101) for
+    webtunnel, so a bridge that is only TCP-reachable but dead at the protocol layer is not counted
 
 * **Fronted** (snowflake, meek-azure, conjure) - no rotating pool exists; these reach Tor through a
   broker / domain fronting using a small set of fixed default lines (placeholder IP). We publish
@@ -51,8 +52,13 @@ import ipaddress
 import json
 import os
 import re
+import shutil
 import socket
 import ssl
+import struct
+import subprocess
+import tempfile
+import time
 from datetime import datetime, timedelta, timezone
 from urllib.parse import urlparse
 
@@ -281,6 +287,138 @@ def test_webtunnel(url: str) -> bool:
     return len(first_line) >= 2 and first_line[1] == "101"
 
 
+# --- obfs4 handshake verification -------------------------------------------
+#
+# obfs4 is designed to look like random bytes, so it cannot be probed without doing the real
+# handshake. We drive an actual obfs4 client (obfs4proxy / lyrebird) over its pluggable-transport
+# SOCKS port: a SOCKS5 CONNECT that succeeds means the obfs4 handshake to the bridge completed, i.e.
+# the bridge is alive at the obfs4 layer, not merely TCP-reachable. IPv4 only (CI runners lack
+# reliable IPv6); the IPv6 list keeps the plain TCP check.
+
+OBFS4_HANDSHAKE_TIMEOUT = 12
+# Safety floor: if the handshake check confirms fewer than this fraction of the TCP-reachable set,
+# assume the harness is unavailable/broken (e.g. no obfs4 binary in CI) and keep the TCP set rather
+# than publishing a decimated list.
+OBFS4_VERIFY_MIN_FRACTION = 0.2
+
+
+def find_obfs4_binary():
+    for candidate in (os.environ.get("OBFS4_BIN"), shutil.which("obfs4proxy"),
+                      shutil.which("lyrebird"), "/usr/bin/obfs4proxy", "/usr/bin/lyrebird"):
+        if candidate and os.path.exists(candidate):
+            return candidate
+    return None
+
+
+def parse_obfs4_v4(line: str):
+    """Return (ip, port, socks_args) for an IPv4 obfs4 bridge line, or None."""
+    m = re.search(r"obfs4\s+(\d{1,3}(?:\.\d{1,3}){3}):(\d+)\s+\S+\s+(.*)$", line.strip())
+    if not m:
+        return None
+    cert = re.search(r"cert=(\S+)", m.group(3))
+    if not cert:
+        return None
+    iat = re.search(r"iat-mode=(\S+)", m.group(3))
+    args = f"cert={cert.group(1)};iat-mode={iat.group(1) if iat else '0'}"
+    return m.group(1), int(m.group(2)), args
+
+
+def start_obfs4proxy(binary: str):
+    """Launch an obfs4 client and return (process, (socks_host, socks_port)) or (process, None)."""
+    state = tempfile.mkdtemp(prefix="obfs4-verify-")
+    env = dict(os.environ)
+    env.update({
+        "TOR_PT_MANAGED_TRANSPORT_VER": "1",
+        "TOR_PT_STATE_LOCATION": state,
+        "TOR_PT_EXIT_ON_STDIN_CLOSE": "1",
+        "TOR_PT_CLIENT_TRANSPORTS": "obfs4",
+    })
+    proc = subprocess.Popen([binary], env=env, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                            stderr=subprocess.DEVNULL, text=True, bufsize=1)
+    socks = None
+    start = time.time()
+    while time.time() - start < 10:
+        line = proc.stdout.readline()
+        if not line:
+            break
+        line = line.strip()
+        m = re.match(r"CMETHOD obfs4 socks5 ([0-9.]+):(\d+)", line)
+        if m:
+            socks = (m.group(1), int(m.group(2)))
+        if line == "CMETHODS DONE":
+            break
+    return proc, socks
+
+
+def obfs4_socks_ok(socks, ip: str, port: int, args: str) -> bool:
+    """SOCKS5 CONNECT through the obfs4 client to ip:port, passing obfs4 args in the auth fields
+    (Tor's PT convention). A 0x00 reply means the obfs4 handshake completed."""
+    try:
+        sock = socket.create_connection(socks, timeout=OBFS4_HANDSHAKE_TIMEOUT)
+    except OSError:
+        return False
+    try:
+        sock.settimeout(OBFS4_HANDSHAKE_TIMEOUT)
+        sock.sendall(b"\x05\x01\x02")                       # SOCKS5, username/password auth
+        if sock.recv(2) != b"\x05\x02":
+            return False
+        raw = args.encode()
+        uname, passwd = (raw, b"\x00") if len(raw) <= 255 else (raw[:255], raw[255:])
+        sock.sendall(bytes([0x01, len(uname)]) + uname + bytes([len(passwd)]) + passwd)
+        if sock.recv(2) != b"\x01\x00":                     # auth accepted
+            return False
+        sock.sendall(b"\x05\x01\x00\x01" + socket.inet_aton(ip) + struct.pack(">H", port))
+        reply = sock.recv(4)
+        return len(reply) >= 2 and reply[1] == 0x00          # 0x00 = handshake succeeded
+    except OSError:
+        return False
+    finally:
+        try:
+            sock.close()
+        except OSError:
+            pass
+
+
+def verify_obfs4_handshakes(bridges: list[str]):
+    """Handshake-verify IPv4 obfs4 bridges through a real obfs4 client. Returns (verified, ran).
+    ran=False means no obfs4 binary was available, so the caller keeps the TCP-tested set. Bridges
+    that cannot be parsed as IPv4 are kept as-is (never dropped for a parse miss)."""
+    binary = find_obfs4_binary()
+    if not binary:
+        return [], False
+
+    parsed = [(b, parse_obfs4_v4(b)) for b in bridges]
+    testable = [(b, p) for (b, p) in parsed if p is not None]
+    unparseable = [b for (b, p) in parsed if p is None]
+    if not testable:
+        return [], False
+
+    proc, socks = start_obfs4proxy(binary)
+    try:
+        if not socks:
+            log("  obfs4 verify: could not start the obfs4 client; keeping TCP-reachable set.")
+            return [], False
+        verified: list[str] = []
+        with concurrent.futures.ThreadPoolExecutor(max_workers=min(MAX_WORKERS, len(testable))) as pool:
+            futures = {pool.submit(obfs4_socks_ok, socks, p[0], p[1], p[2]): b for (b, p) in testable}
+            for future in concurrent.futures.as_completed(futures):
+                try:
+                    if future.result():
+                        verified.append(futures[future])
+                except Exception:  # noqa: BLE001 - one probe must never kill the run
+                    pass
+        return verified + unparseable, True
+    finally:
+        try:
+            proc.stdin.close()
+            proc.wait(timeout=5)
+        except Exception:  # noqa: BLE001
+            try:
+                proc.kill()
+            except Exception:  # noqa: BLE001
+                pass
+
+
 def is_reachable(bridge_line: str) -> bool:
     # Fronted transports (snowflake/meek/conjure) carry a placeholder IP and reach Tor via a broker
     # or domain front; probe that front/broker host on 443 (TLS) instead of the dummy endpoint.
@@ -459,6 +597,16 @@ def main() -> None:
             write_lines(os.path.join(BRIDGE_DIR, recent_name), recent)
 
             tested = test_many(sorted(archive))
+            # obfs4 (IPv4) additionally gets a real handshake check: obfs4 cannot be probed without
+            # doing the handshake, so a TCP-reachable bridge can still be dead at the obfs4 layer.
+            if transport == "obfs4" and not ipv6 and tested:
+                verified, ran = verify_obfs4_handshakes(tested)
+                if ran and len(verified) >= max(1, int(len(tested) * OBFS4_VERIFY_MIN_FRACTION)):
+                    log(f"  obfs4 verify: {len(verified)}/{len(tested)} completed the obfs4 handshake.")
+                    tested = verified
+                elif ran:
+                    log(f"  obfs4 verify: only {len(verified)}/{len(tested)} handshakes; keeping "
+                        "TCP-reachable set (harness may be unavailable).")
             write_lines(os.path.join(BRIDGE_DIR, tested_name), tested)
 
             stats[base_name] = len(archive)

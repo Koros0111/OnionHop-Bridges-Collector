@@ -29,6 +29,9 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Install obfs4proxy (for real obfs4 handshake verification)
+        run: sudo apt-get update && sudo apt-get install -y obfs4proxy
+
       - name: Collect, validate and archive bridges
         run: python main.py
 
