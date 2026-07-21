@@ -5,7 +5,7 @@ Automatically collects, validates and archives Tor bridges for the
 hourly to fetch fresh bridges from the official Tor Project and community
 sources, then TCP/TLS-tests them.
 
-_Last updated: 2026-07-21 09:35 UTC_
+_Last updated: 2026-07-21 11:56 UTC_
 
 ## Pooled transports
 
